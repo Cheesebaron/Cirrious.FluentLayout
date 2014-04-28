@@ -1,25 +1,43 @@
-Bla bla bla needs more information
-
+To get started, create some `UIView` instances as per usual, however do not add any information about how they have to lay themself out. So for instance:
 
 ```
-//textView width
-View.AddConstraint (NSLayoutConstraint.Create (
-    textView, NSLayoutAttribute.Width, 
-    NSLayoutRelation.Equal, null, 
-    NSLayoutAttribute.NoAttribute, 0, 300));
- 
-//textView top 
-View.AddConstraint (NSLayoutConstraint.Create (
-    textView, NSLayoutAttribute.Top, 
-    NSLayoutRelation.Equal, View, 
-    NSLayoutAttribute.Top, 1, 100));
-    
-//textView left
-View.AddConstraint (NSLayoutConstraint.Create (
-    textView, NSLayoutAttribute.Left, 
-    NSLayoutRelation.Equal, View, 
-    NSLayoutAttribute.Left, 1, 10));
+var button = new UIButton(UIButtonType.RoundedRect);
+button.SetTitle("Search", UIControlState.Normal);
+
+var text = new UITextField() { BorderStyle = UITextBorderStyle.RoundedRect };
+
+Add(button);
+Add(text);
 ```
 
-This helps a bit positioning the `UIVIew`s, however it does add a substantial amount of code, and the piece of code above only sets 3 constraints, which we
-would also need to set for the other `UIView`. So here comes the point of this project. FluentLayout simplifies the process of adding constraints compared to the API iOS provides. Here is a sample of what it would look like for the two `UIView`s.
+To make the constraints work you need to run:
+
+```
+View.SubviewsDoNotTranslateAutoresizingMaskIntoConstraints();
+```
+
+Now you can add your constraints using `FluentLayout` to your created views:
+
+```
+var hPadding = 10;
+var vPadding = 10;
+var ButtonWidth = 100;
+
+View.AddConstraints(
+
+        button.AtTopOf(View).Plus(vPadding),
+        button.AtRightOf(View).Minus(hPadding),
+        button.Width().EqualTo(ButtonWidth),
+
+        text.AtLeftOf(View, hPadding),
+        text.ToLeftOf(button, hPadding),
+        text.WithSameTop(button)
+
+    );
+```
+
+So the above code takes the `UIButton`, aligns it at the top of `View`, which comes from the `UIViewController` we are currently in, and adds some padding to that. It also aligns it at right of it with some padding, and assigns a width of 100 to the button.
+
+For the `UITextField` it does somewhat the same, but aligns it to the left in the view and to the left of the button.
+
+For more examples look in the samples application. You can also watch this [video tutorial explaining FluentLayout](https://www.youtube.com/watch?v=5BAuOq-FcJM).
